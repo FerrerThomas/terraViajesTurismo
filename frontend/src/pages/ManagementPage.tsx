@@ -70,6 +70,21 @@ const ManagementPage: React.FC = () => {
     }
   };
 
+  const handleDetailChange = (index: number, value: string) => {
+    const newDetails = [...formData.details];
+    newDetails[index] = value;
+    setFormData({ ...formData, details: newDetails });
+  };
+
+  const addDetail = () => {
+    setFormData({ ...formData, details: [...formData.details, ''] });
+  };
+
+  const removeDetail = (index: number) => {
+    const newDetails = formData.details.filter((_, i) => i !== index);
+    setFormData({ ...formData, details: newDetails });
+  };
+
   const resetForm = () => {
     setEditingItem(null);
     setFormData({
@@ -82,6 +97,21 @@ const ManagementPage: React.FC = () => {
       details: [''],
       price: 0,
       currency: 'USD'
+    });
+  };
+
+  const handleEdit = (item: any) => {
+    setEditingItem(item);
+    setFormData({
+      title: item.title,
+      description: item.description || '',
+      destination: item.destination || '',
+      duration: item.duration,
+      departureDate: item.departureDate,
+      image: item.image,
+      details: item.details,
+      price: item.price,
+      currency: item.currency
     });
   };
 
@@ -114,20 +144,132 @@ const ManagementPage: React.FC = () => {
             </h2>
             
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Form fields */}
               <div>
                 <label className="block text-sm font-medium text-gray-300">Título</label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  className="mt-1 block w-full rounded-md border-gray-700 bg-gray-700 text-white"
+                  className="mt-1 block w-full rounded-md border-gray-700 bg-gray-700 text-white p-2"
                   required
                 />
               </div>
-              
-              {/* Add more form fields for other properties */}
-              
+
+              {activeTab === 'packages' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-300">Destino</label>
+                  <input
+                    type="text"
+                    value={formData.destination}
+                    onChange={(e) => setFormData({...formData, destination: e.target.value})}
+                    className="mt-1 block w-full rounded-md border-gray-700 bg-gray-700 text-white p-2"
+                    required
+                  />
+                </div>
+              )}
+
+              {activeTab === 'cruises' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-300">Descripción</label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    className="mt-1 block w-full rounded-md border-gray-700 bg-gray-700 text-white p-2"
+                    required
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300">Duración</label>
+                <input
+                  type="text"
+                  value={formData.duration}
+                  onChange={(e) => setFormData({...formData, duration: e.target.value})}
+                  className="mt-1 block w-full rounded-md border-gray-700 bg-gray-700 text-white p-2"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300">Fecha de Salida</label>
+                <input
+                  type="text"
+                  value={formData.departureDate}
+                  onChange={(e) => setFormData({...formData, departureDate: e.target.value})}
+                  className="mt-1 block w-full rounded-md border-gray-700 bg-gray-700 text-white p-2"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300">URL de la Imagen</label>
+                <input
+                  type="url"
+                  value={formData.image}
+                  onChange={(e) => setFormData({...formData, image: e.target.value})}
+                  className="mt-1 block w-full rounded-md border-gray-700 bg-gray-700 text-white p-2"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300">Detalles</label>
+                {formData.details.map((detail, index) => (
+                  <div key={index} className="flex gap-2 mt-2">
+                    <input
+                      type="text"
+                      value={detail}
+                      onChange={(e) => handleDetailChange(index, e.target.value)}
+                      className="flex-1 rounded-md border-gray-700 bg-gray-700 text-white p-2"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => removeDetail(index)}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      Eliminar
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  onClick={addDetail}
+                  variant="secondary"
+                  size="sm"
+                  className="mt-2"
+                >
+                  Agregar Detalle
+                </Button>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300">Precio</label>
+                <input
+                  type="number"
+                  value={formData.price}
+                  onChange={(e) => setFormData({...formData, price: Number(e.target.value)})}
+                  className="mt-1 block w-full rounded-md border-gray-700 bg-gray-700 text-white p-2"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300">Moneda</label>
+                <select
+                  value={formData.currency}
+                  onChange={(e) => setFormData({...formData, currency: e.target.value})}
+                  className="mt-1 block w-full rounded-md border-gray-700 bg-gray-700 text-white p-2"
+                  required
+                >
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="ARS">ARS</option>
+                </select>
+              </div>
+
               <div className="flex space-x-4">
                 <Button type="submit" variant="primary">
                   {editingItem ? 'Actualizar' : 'Crear'}
@@ -150,9 +292,12 @@ const ManagementPage: React.FC = () => {
               {(activeTab === 'packages' ? packages : cruises).map((item: any) => (
                 <div key={item._id} className="bg-gray-700 p-4 rounded-lg">
                   <h3 className="text-lg font-medium text-white">{item.title}</h3>
+                  <p className="text-gray-300 text-sm mt-1">
+                    {item.destination || item.description}
+                  </p>
                   <div className="mt-2 flex space-x-4">
                     <Button
-                      onClick={() => setEditingItem(item)}
+                      onClick={() => handleEdit(item)}
                       variant="secondary"
                       size="sm"
                     >
